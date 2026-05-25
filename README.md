@@ -1,6 +1,6 @@
 # Decoder
 
-*A tool by [thepmcode.com](https://thepmcode.com)*
+*A tool by [The PM Code](https://www.linkedin.com/company/the-pm-code/) — follow us on LinkedIn*
 
 ---
 
@@ -95,13 +95,13 @@ If you get it wrong, Decoder names what you got right first, then comes at the c
 **Option 1 — git clone**
 
 ```bash
-git clone https://github.com/[your-org]/decoder ~/.claude/skills/decoder
+git clone https://github.com/Anmoll-W/decoder ~/.claude/skills/decoder
 ```
 
 **Option 2 — curl**
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/[your-org]/decoder/main/SKILL.md \
+curl -fsSL https://raw.githubusercontent.com/Anmoll-W/decoder/main/SKILL.md \
   -o ~/.claude/skills/decoder/SKILL.md
 ```
 
@@ -121,4 +121,4 @@ Decoder does not make you an engineer. It makes you the PM who asks the question
 
 ---
 
-*Built by [thepmcode.com](https://thepmcode.com) — where PMs learn to think like engineers without becoming one.*
+*Built by [The PM Code](https://www.linkedin.com/company/the-pm-code/) — follow along as we build in public.*
