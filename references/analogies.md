@@ -73,7 +73,7 @@ A bouncer at a club who counts how many people come through the door per minute.
 ## Software Development
 
 **Git branch**
-A parallel-universe notebook. You make changes in a universe where nothing can break the main one. When you're happy with the changes, you merge the universes. If you made a mess, you close that universe and pretend it never existed.
+A scribe who copies your entire manuscript into a private workroom before making any edits. They work in isolation — whatever they do in that room, the original in the main library is untouched. When their edits are approved, a librarian merges both manuscripts. If the edits were a disaster, the workroom copy is discarded. Nothing in the original library ever saw the mess.
 
 **CI/CD pipeline**
 A car assembly line with quality-control stations at every step. The code moves automatically through testing, linting, and build checks. If any station finds a defect, the line stops before the car reaches the customer — not after.
