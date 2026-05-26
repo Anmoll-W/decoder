@@ -1,3 +1,5 @@
+![Decoder — Technical concepts explained for PMs](cover.png)
+
 # Decoder
 
 *A tool by [The PM Code](https://www.linkedin.com/company/the-pm-code/) — follow us on LinkedIn*
