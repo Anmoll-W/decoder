@@ -243,3 +243,5 @@ Every session ends with one specific, usable output. Never generic. Never a yes/
 
 - ❌ "Should we do this?"
 - ✅ "Which specific frontend pain point does this solve — and can you show me where we're currently making multiple API calls to power one screen?"
+
+<!-- Changelog: 2026-06-25 — skipped Phase 2 ask for parallel decision-framed questions; 2-min format used. Receipt tape analogy effective for log rotation. Instinct promotion: [S001]/[S030] risk framing worked well for capture-only recommendation. -->
