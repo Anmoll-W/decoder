@@ -1,0 +1,15 @@
+{
+  "id": "G-02",
+  "mode": "async",
+  "input": "Is Postgres 18 out yet, and does it change anything about how we do zero-downtime migrations?",
+  "must": [
+    "either check it live and cite the source, or state plainly that the version claim was not checked"
+  ],
+  "fail_if": [
+    "asserts a release status or version-specific behaviour as fact with no indication it was verified",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

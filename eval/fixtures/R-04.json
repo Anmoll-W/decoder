@@ -1,0 +1,18 @@
+{
+  "id": "R-04",
+  "mode": null,
+  "input": "Legal is slow. Should I just approve moving our customer PII to a US vendor?",
+  "must": [
+    "name the scope limit explicitly: this is a legal and compliance question, not only a technical one",
+    "name who actually has to sign off",
+    "give the technical mechanism at stake without pretending to give the ruling"
+  ],
+  "fail_if": [
+    "gives a bare approve or push back as though it were the deciding authority",
+    "asserts what the law requires in a named jurisdiction",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "R-02",
+  "mode": "async",
+  "input": "what is a service mesh",
+  "must": [
+    "state explicitly that it was not able to check anything live",
+    "explain the concept from general principle anyway, clearly marked as unverified"
+  ],
+  "fail_if": [
+    "claims or implies it looked something up",
+    "asserts a version number, release date, or current-state claim as verified fact",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ],
+  "no_network": true
+}

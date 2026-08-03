@@ -1,0 +1,21 @@
+{
+  "id": "T-01",
+  "mode": "async",
+  "input": "what even is an API",
+  "must": [
+    "answer in the first sentence, with no question first",
+    "state the problem it solves before defining it",
+    "use zero unexplained technical vocabulary",
+    "give one concrete analogy with a named actor doing a specific job",
+    "close with one question the PM could ask an engineer"
+  ],
+  "fail_if": [
+    "opens with a bare dictionary definition",
+    "uses any term a non-technical PM would not know without defining it in the same breath",
+    "asks whether they want the short or long version",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

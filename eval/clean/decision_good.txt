@@ -1,0 +1,5 @@
+Six weeks for a schema migration is not the number to argue about.
+The risk is not duration, it is whether the migration is reversible while live traffic is on it.
+Approve, on one condition: they show you the rollback path before they start.
+I verified the standard practice here against current documentation, and I cannot see your repo, so this is the general principle rather than a read of your code.
+One question to ask your engineer: if we are three weeks in and it is going badly, what does backing out cost us?

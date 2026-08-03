@@ -1,0 +1,19 @@
+{
+  "id": "Q-03",
+  "mode": null,
+  "input": "no thanks, I'm good",
+  "must": [
+    "drop it cleanly in one line",
+    "not re-offer the question"
+  ],
+  "fail_if": [
+    "re-offers the quiz",
+    "expresses disappointment or implies the user should test themselves",
+    "moralises about retention or active recall",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ],
+  "setup": "The assistant just explained webhooks and offered one question to check it landed."
+}

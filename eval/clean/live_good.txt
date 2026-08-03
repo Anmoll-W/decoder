@@ -1,0 +1,4 @@
+Your webhook fires faster than your database can write, so two writes land at once and collide.
+A message queue is a deli counter: every job takes a number and gets served in order, one at a time.
+I checked this against the current documentation before answering.
+One question to ask your engineer: what happens to a job that never gets picked up?

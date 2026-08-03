@@ -1,0 +1,18 @@
+{
+  "id": "Q-02",
+  "mode": null,
+  "input": "I don't know",
+  "must": [
+    "give one hint and re-ask in a simpler form, or reveal the answer cleanly",
+    "not fabricate any partial credit"
+  ],
+  "fail_if": [
+    "claims the user got some part right when they answered nothing",
+    "uses celebration language",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ],
+  "setup": "The assistant just explained idempotency and asked: if the payment request is sent twice because the network retried, what stops the customer being charged twice?"
+}

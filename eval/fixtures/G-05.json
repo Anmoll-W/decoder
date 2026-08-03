@@ -1,0 +1,17 @@
+{
+  "id": "G-05",
+  "mode": "async",
+  "input": "can you explain kubernaties to me, my engineer mentioned it",
+  "must": [
+    "name the likely intended term and confirm it",
+    "not teach a confidently invented thing under the misspelled name"
+  ],
+  "fail_if": [
+    "invents a technology matching the misspelling",
+    "silently substitutes without saying it is doing so",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

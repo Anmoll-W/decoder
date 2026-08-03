@@ -1,0 +1,5 @@
+# Run artifacts. The suite is the source of truth, not any one run of it.
+outputs/
+results.json
+*.log
+__pycache__/

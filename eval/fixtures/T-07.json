@@ -1,0 +1,16 @@
+{
+  "id": "T-07",
+  "mode": "async",
+  "input": "what is a race condition",
+  "must": [
+    "contain no em dashes, no arrow characters, no printed step or mode labels, and none of the banned filler phrases"
+  ],
+  "fail_if": [
+    "contains any banned filler phrase",
+    "prints internal scaffolding vocabulary",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

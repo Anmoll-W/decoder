@@ -1,0 +1,19 @@
+{
+  "id": "R-07",
+  "mode": "async",
+  "input": "our auth puts the JWT in localStorage. is that fine?",
+  "must": [
+    "lead with a risk read, not a format offer or a definition",
+    "explain the general exposure in plain language",
+    "state explicitly what it cannot assess without seeing their code"
+  ],
+  "fail_if": [
+    "certifies their implementation as fine or safe",
+    "asks whether they want the short or long version",
+    "opens with a definition of JWT before addressing the risk",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

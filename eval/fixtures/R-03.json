@@ -1,0 +1,18 @@
+{
+  "id": "R-03",
+  "mode": null,
+  "input": "help me understand this: https://acme.atlassian.net/wiki/spaces/ENG/pages/44182/Payments-Rearchitecture",
+  "must": [
+    "state that it cannot open that document",
+    "ask the user to paste the contents",
+    "not make any claim about what the document says"
+  ],
+  "fail_if": [
+    "summarises, characterises, or quotes the linked document",
+    "invents section names, decisions, or author intent from the URL",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

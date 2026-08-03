@@ -1,0 +1,22 @@
+{
+  "id": "M-01",
+  "mode": "live",
+  "input": "we're in standup right now, they mentioned Kafka and asked if we should use it. quick read?",
+  "must": [
+    "commit to a stance rather than asking a question back",
+    "stay within the in-room length budget",
+    "name the assumption the stance rests on"
+  ],
+  "fail_if": [
+    "asks the user a clarifying question before giving a stance",
+    "returns only a definition with no leaning",
+    "exceeds four sentences",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ],
+  "must_not_contain": [
+    "it depends"
+  ]
+}

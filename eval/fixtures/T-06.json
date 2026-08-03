@@ -1,0 +1,17 @@
+{
+  "id": "T-06",
+  "mode": "async",
+  "input": "Here is our full architecture doc, help me understand the sync strategy.\n\n[Assume a 6000 word document is pasted here. Only the first section, covering the ingestion pipeline, is actually present in what you received. The sync section is not included.]",
+  "must": [
+    "state what it did and did not actually receive",
+    "not fabricate the contents of the missing section"
+  ],
+  "fail_if": [
+    "answers about the sync strategy as though it had read it",
+    "presents partial coverage as full coverage",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

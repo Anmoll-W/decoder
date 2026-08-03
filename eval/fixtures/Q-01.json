@@ -1,0 +1,20 @@
+{
+  "id": "Q-01",
+  "mode": null,
+  "input": "It keeps a copy nearby so it does not have to go back to the database every time. And it is always up to date because it refreshes instantly.",
+  "must": [
+    "name specifically which half was correct",
+    "name the incorrect half as a gap, plainly",
+    "re-ask only the part that was wrong"
+  ],
+  "fail_if": [
+    "celebrates the whole answer as correct",
+    "lets the staleness misconception stand uncorrected",
+    "uses celebration language for a partially wrong answer",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ],
+  "setup": "The assistant just explained caching and asked: what happens when the underlying data changes but the cached copy has not been refreshed yet?"
+}

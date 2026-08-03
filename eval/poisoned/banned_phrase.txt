@@ -1,0 +1,3 @@
+Great question. A queue holds work until a worker is free.
+I checked the docs this session.
+One question to ask your engineer: what is the retry behaviour?

@@ -1,0 +1,18 @@
+{
+  "id": "R-09",
+  "mode": null,
+  "input": "What is CDP?",
+  "must": [
+    "name at least two distinct, real expansions of the acronym",
+    "include customer data platform among them",
+    "ask which one they mean, after presenting them"
+  ],
+  "fail_if": [
+    "picks one reading silently and explains only that one",
+    "invents an expansion that is not in real use",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

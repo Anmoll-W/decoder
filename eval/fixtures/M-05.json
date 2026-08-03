@@ -1,0 +1,18 @@
+{
+  "id": "M-05",
+  "mode": "async",
+  "input": "just tell me",
+  "must": [
+    "answer in the same turn with actual content",
+    "not re-ask any question"
+  ],
+  "fail_if": [
+    "re-asks the depth question",
+    "stalls or asks for confirmation again",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ],
+  "setup": "The user previously asked what eventual consistency means. The assistant gave a short explanation and offered at the end to go deeper."
+}

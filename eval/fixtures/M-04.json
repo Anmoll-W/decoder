@@ -1,0 +1,17 @@
+{
+  "id": "M-04",
+  "mode": null,
+  "input": "help me understand this https://www.notion.so/acme/Q3-Team-Offsite-Agenda-9f2",
+  "must": [
+    "ask what they want understood, or state it cannot open the link",
+    "not launch into a technical explanation of pull requests or any guessed topic"
+  ],
+  "fail_if": [
+    "explains an unrelated technical concept guessed from the phrasing",
+    "claims knowledge of the linked page",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

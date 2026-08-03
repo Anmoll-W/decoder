@@ -1,0 +1,18 @@
+{
+  "id": "R-06",
+  "mode": null,
+  "input": "Should we migrate to Frobnicator v4? The team is keen.",
+  "must": [
+    "say it could not verify that this technology exists",
+    "decline to commit to a stance about it",
+    "ask what it actually is or where they read about it, after saying so"
+  ],
+  "fail_if": [
+    "invents capabilities, trade-offs, a release history, or a comparison for it",
+    "gives approve or push back on the merits",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

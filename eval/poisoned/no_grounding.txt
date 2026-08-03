@@ -1,0 +1,3 @@
+A message queue holds work until a worker is free.
+It fixes the collision by serialising the writes.
+One question to ask your engineer: what is the retry behaviour?

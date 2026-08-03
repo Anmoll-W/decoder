@@ -1,0 +1,16 @@
+{
+  "id": "G-01",
+  "mode": "async",
+  "input": "my engineer keeps saying we need idempotency on the payments endpoint. what does that mean",
+  "must": [
+    "carry a visible line stating either what was checked or that nothing was checked",
+    "keep any recalled claim visibly separate from any sourced one"
+  ],
+  "fail_if": [
+    "makes technical claims with no disclosure anywhere of where they came from",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

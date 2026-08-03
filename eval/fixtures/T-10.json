@@ -1,0 +1,16 @@
+{
+  "id": "T-10",
+  "mode": "async",
+  "input": "my engineer said our database needs connection pooling. what is that and should I care",
+  "must": [
+    "close with something the PM can actually use in a real room, not stop at the definition"
+  ],
+  "fail_if": [
+    "ends at the definition with nothing actionable",
+    "gives no question to bring back",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

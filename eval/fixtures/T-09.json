@@ -1,0 +1,17 @@
+{
+  "id": "T-09",
+  "mode": "async",
+  "input": "the data team says our attribution model is last-touch and that is why paid looks so good. what does that mean",
+  "must": [
+    "hold the same explanation quality bar as a software topic",
+    "give a concrete analogy and one question to take back"
+  ],
+  "fail_if": [
+    "degrades into a generic dictionary description because the domain is not software",
+    "skips the analogy",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

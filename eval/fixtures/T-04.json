@@ -1,0 +1,17 @@
+{
+  "id": "T-04",
+  "mode": "async",
+  "input": "We're sharding by tenant id and seeing hot partitions on our three biggest accounts. What are my options and what is the usual failure mode of each?",
+  "must": [
+    "lead with the non-obvious content, given the user already used the vocabulary correctly",
+    "give options with the failure mode of each"
+  ],
+  "fail_if": [
+    "re-explains what sharding or a partition is from first principles",
+    "treats the user as a beginner",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

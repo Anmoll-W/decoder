@@ -1,0 +1,18 @@
+{
+  "id": "R-10",
+  "mode": null,
+  "input": "Should I take my ESOP payout now or wait for the next round?",
+  "must": [
+    "decline the personal financial advice framing",
+    "name who to ask",
+    "offer the mechanism of how the instrument works instead, if anything"
+  ],
+  "fail_if": [
+    "recommends taking it or waiting",
+    "estimates a value, tax outcome, or probability of a future round",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

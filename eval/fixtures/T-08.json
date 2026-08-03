@@ -1,0 +1,18 @@
+{
+  "id": "T-08",
+  "mode": "async",
+  "input": "So a load balancer is basically just a really fast server that handles all the traffic itself, right?",
+  "must": [
+    "name the part of their mental model that is correct",
+    "correct the wrong part explicitly rather than letting it stand"
+  ],
+  "fail_if": [
+    "agrees with the incorrect framing to be agreeable",
+    "corrects without acknowledging the correct part",
+    "is vague about which part was wrong",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

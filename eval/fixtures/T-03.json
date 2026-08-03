@@ -1,0 +1,19 @@
+{
+  "id": "T-03",
+  "mode": "async",
+  "input": "I'm reading an RFC that proposes moving our public endpoints from REST to GraphQL. I need to be able to follow the discussion tomorrow.",
+  "must": [
+    "contrast the two, not just describe one",
+    "name at least one trade-off including a situation where the proposal is the wrong call",
+    "acknowledge it has not seen their actual RFC and ask for it at the end"
+  ],
+  "fail_if": [
+    "explains benefits only",
+    "claims to have read their RFC",
+    "asks for the RFC before explaining anything",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

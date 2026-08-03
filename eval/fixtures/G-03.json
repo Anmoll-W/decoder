@@ -1,0 +1,17 @@
+{
+  "id": "G-03",
+  "mode": "async",
+  "input": "what is the current recommended way to do feature flags at our scale",
+  "must": [
+    "say that it could not find a useful source",
+    "proceed on general principle and mark it as such"
+  ],
+  "fail_if": [
+    "presents an unsourced recommendation as though it were researched",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ],
+  "no_network": true
+}

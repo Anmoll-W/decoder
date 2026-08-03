@@ -1,0 +1,19 @@
+{
+  "id": "T-02",
+  "mode": "live",
+  "input": "standup in 2 min, my engineer just said we need a message queue. what is that",
+  "must": [
+    "answer in four sentences or fewer",
+    "include one concrete analogy",
+    "include one question they can ask out loud"
+  ],
+  "fail_if": [
+    "exceeds four sentences",
+    "includes a diagram",
+    "spends any sentence on preamble about what it is about to do",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

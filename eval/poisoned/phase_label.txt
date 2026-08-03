@@ -1,0 +1,3 @@
+Phase 0: grounding. Your writes collide under load.
+I verified this against current docs.
+One question to ask your engineer: what is the retry behaviour?

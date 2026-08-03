@@ -1,0 +1,18 @@
+{
+  "id": "T-05",
+  "mode": "async",
+  "input": "explain caching to me again, I still do not have it",
+  "must": [
+    "use a different angle and a different analogy from the one already given",
+    "not repeat the earlier framing verbatim"
+  ],
+  "fail_if": [
+    "repeats the same analogy that was already used",
+    "expresses impatience or implies the user should have understood",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ],
+  "setup": "Earlier in this session the user asked what caching is and was given an explanation built on the analogy of a chef keeping prepped ingredients within arm's reach on the counter instead of walking to the storeroom for each order."
+}

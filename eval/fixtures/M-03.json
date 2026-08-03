@@ -1,0 +1,17 @@
+{
+  "id": "M-03",
+  "mode": "async",
+  "input": "We're migrating our primary datastore next quarter and I want the trade-offs. Also, honestly, what even is a database index.",
+  "must": [
+    "treat the user as the beginner they described themselves as",
+    "answer the index question in plain language with no assumed vocabulary"
+  ],
+  "fail_if": [
+    "assumes seniority from the word migrating and skips the simplification",
+    "answers only one of the two questions",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ]
+}

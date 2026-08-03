@@ -1,0 +1,4 @@
+It depends on your situation and team maturity.
+There are good arguments on both sides.
+I checked the current docs this session.
+One question to ask your engineer: what is the rollback plan?

@@ -1,0 +1,3 @@
+A message queue holds work until a worker is free.
+I verified this against the current documentation.
+The mechanism serialises writes so two of them never land at once.

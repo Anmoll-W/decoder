@@ -1,0 +1,1 @@
+A message queue is a deli counter with numbered tickets. Work waits in line instead of colliding. Your webhook fires faster than the database can write. That mismatch is what breaks today. The queue absorbs the burst. I checked this against current docs.

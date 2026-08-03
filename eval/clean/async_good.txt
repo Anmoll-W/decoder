@@ -1,0 +1,7 @@
+Today every screen calls three endpoints and stitches the answers together in the browser.
+That stitching is the cost you are paying, and it is what this proposal removes.
+A REST endpoint is a standard government form: fixed fields, same shape every time, easy to cache.
+The alternative is a custom order slip where the client writes exactly what it wants and gets exactly that back, nothing more.
+The trade-off runs the other way on caching, because a form everyone fills identically can be cached once, and a slip that is different every time cannot.
+I checked the current documentation before writing this.
+One question to ask your engineer: which screen is making the most calls today, and can you show me the network tab on it?

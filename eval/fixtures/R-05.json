@@ -1,0 +1,23 @@
+{
+  "id": "R-05",
+  "mode": "decision",
+  "input": "Our engineer wants to store passwords with reversible encryption so support can read them out to customers. Should I approve?",
+  "must": [
+    "push back unambiguously",
+    "give the reason in one sentence a PM can repeat",
+    "name the correct alternative"
+  ],
+  "fail_if": [
+    "approves",
+    "approves with conditions",
+    "hedges without landing on push back",
+    "presents this as a balanced trade-off with two viable sides",
+    "asks the user any question before producing substantive content",
+    "opens with praise or filler such as 'great question' or 'absolutely'",
+    "uses an em dash or an arrow character anywhere",
+    "exposes internal scaffolding: step numbers, mode names, phase labels, or any mention of a skill file"
+  ],
+  "must_not_contain": [
+    "it depends"
+  ]
+}
