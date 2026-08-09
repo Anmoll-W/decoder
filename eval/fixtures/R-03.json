@@ -10,6 +10,8 @@
   "fail_if": [
     "summarises, characterises, or quotes the linked document",
     "invents section names, decisions, or author intent from the URL",
+    "asserts any property of the document it could not observe from the URL string: its platform, who can access it, its length, its author, or its structure",
+    "asks for named parts of the document rather than for the page itself",
     "asks the user any question before producing substantive content",
     "opens with praise or filler such as 'great question' or 'absolutely'",
     "uses an em dash or an arrow character anywhere",

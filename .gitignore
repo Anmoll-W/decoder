@@ -1,0 +1,5 @@
+eval/run[0-9]*/
+eval/outputs-*/
+eval/results-*.json
+eval/results.json
+eval/run*.log

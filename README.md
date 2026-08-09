@@ -83,6 +83,49 @@ The same rule applies to comparisons. If Decoder contrasts one technology agains
 
 ---
 
+## How an answer gets built
+
+Nothing in this path is a question back to you. The refusal check runs before the stance, which is why Decoder never opens with "push back" and then concedes four paragraphs later that the call was never yours to make.
+
+```mermaid
+flowchart TD
+    Q["A PM asks: a term, a pasted doc, an approval call"]
+    R{"Refusal domain?"}
+    REF["Refuse in the written shape.<br/>Scope limit first. A role who signs off, never a process.<br/>No stance, no analogy."]
+    I{"Step 1: intent"}
+    EX["EXPLAIN: what it is, how it works"]
+    DE["DECIDE: approve, push back, or hold for one named number"]
+    SA["SAFETY: risk read in sentence one. Overrides the other two."]
+    B{"Step 2: budget. Inferred, never asked."}
+    IR["IN-ROOM: 4 sentences, no diagram"]
+    ST["STANDARD: under 400 words"]
+    DP["DEEP: as long as it earns"]
+    G["Step 3: check the claim if you can"]
+    A["Step 4: the answer, in this order<br/>1. One sentence that answers the literal question<br/>2. A character whose job makes the failure obvious<br/>3. What it means for you<br/>4. The common mistake, STANDARD and DEEP only<br/>5. Ask your engineer, readable aloud"]
+    GL["Last line, always. Either 'Checked: source'<br/>or 'Not checked live'"]
+
+    Q --> R
+    R -->|yes| REF
+    R -->|no| I
+    I --> EX
+    I --> DE
+    I --> SA
+    EX --> B
+    DE --> B
+    SA --> B
+    B --> IR
+    B --> ST
+    B --> DP
+    IR --> G
+    ST --> G
+    DP --> G
+    G --> A
+    A --> GL
+    REF --> GL
+```
+
+Intent and budget are independent. Every combination is valid, because budget changes how long an answer is and never what shape it has. IN-ROOM is the one exception worth stating: it drops "what it means for you" and "the common mistake" to hit four sentences, and it still ships the grounding line, which never counts against that budget.
+
 ## What it will not do
 
 Written into the skill, not left to judgment:
@@ -119,6 +162,31 @@ After it has explained, and only after, Decoder may offer one question to check 
 Get it right and you get the non-obvious implication that most people miss. Get half of it right and Decoder names which half, calls the gap a gap, and re-asks only that part. Say no and it drops the subject without comment and does not ask again.
 
 ---
+
+## How it is tested
+
+The rules above are not aspirations. They are graded by an adversarial eval suite in [`eval/`](eval): 33 fixtures across five classes, grounding, mode and budget, question quality, refusal, and teaching. Every fixture is built to make Decoder fail in one specific way, and each answer is graded by a second model instructed to refute it rather than confirm it.
+
+```mermaid
+flowchart TD
+    F["Fixture, for example R-06"] --> S["Isolated 'claude -p' subprocess<br/>--setting-sources project, empty working dir<br/>so the operator's own config cannot leak in"]
+    S --> O["Answer, graded on SKILL.md alone"]
+    O --> L["Mechanical lint<br/>banned characters, literal must-not-contain"]
+    L --> J["Judge model, instructed to refute<br/>Opus for the refusal and grounding classes"]
+    J --> V{"Refusal class at 9 of 10 or better?"}
+    V -->|no| X["Blocked. Fix, then re-run."]
+    V -->|yes| C{"Second consecutive run,<br/>same SKILL.md hash?"}
+    C -->|no| S
+    C -->|yes| P["Release gate green"]
+```
+
+Two thresholds are worth knowing before you quote any number from this repo.
+
+**The gate is 9 of 10 on the refusal class, not 10 of 10.** Roughly a fifth of fixtures flip verdict against a byte-identical file, so demanding a perfect score twice in a row is not a high bar, it is an unreachable state. A gate that can never go green gets waived by whoever is in a hurry, which is worse than a slightly lower bar that is actually enforced.
+
+**There is no overall pass-rate percentage, deliberately.** At that flip rate a single headline number would be mostly sampling noise. The suite holds a direction instead: the always-fail set must not grow, and no fixture may leave the always-pass set. Every published figure names the `SKILL.md` hash it was measured against and whether the harness was isolated.
+
+Full methodology, including the measurement that showed 31% of one graded prompt was the operator's own configuration rather than the skill: `eval/README.md`.
 
 ## Install
 

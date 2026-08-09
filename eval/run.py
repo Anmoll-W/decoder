@@ -26,6 +26,7 @@ import json
 import re
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 
@@ -47,6 +48,67 @@ TIMEOUT = 420
 # wall-clock to clear, not an immediate re-ask.
 BACKOFF_BASE = 45
 
+# Harness isolation (added 2026-08-07, TWV-1080).
+#
+# Every fixture is answered by a `claude -p` subprocess, and that subprocess is a
+# normal Claude Code session: it loads the user's settings, which register a
+# UserPromptSubmit hook that prepends the operator's global instruction stack to
+# the prompt. Measured on fixture R-06: 5,651 injected chars into an 18,134-char
+# prompt, so 31% of what the run graded was the operator's config rather than the
+# skill under test. That injection also carried a literal em dash, which failed
+# the skill's own no_em_dashes lint and cost a release-gate refusal fixture in
+# run 12. The eval was partly measuring the machine it ran on.
+#
+# `--setting-sources project` drops the user source, where the hooks live.
+# Verified 2026-08-07 by diffing session transcripts: with the default flags the
+# markers DOC STANDARD, AUTO-ROUTE, and "Lesson(s) applied" all appear; with this
+# flag all three are absent. OAuth auth is unaffected (auth is not a settings
+# source), unlike `--bare`, which would also work but forces API-key auth.
+#
+# ISOLATED_CWD then makes `project` resolve to nothing: an empty directory has no
+# .claude/settings.json, so no project settings are discovered. Reads still work
+# because the skill directory is granted explicitly via --add-dir.
+#
+# The gap that was flagged here as unverified on 2026-08-07 was measured on
+# 2026-08-09 and was real. CLAUDE.md discovery is NOT a settings source, so
+# `--setting-sources project` does not touch it. Discovery walks UP the tree from
+# cwd, and the old isolated cwd was eval/.isolated-cwd, which sits inside
+# /Users/aw, so every run loaded /Users/aw/CLAUDE.md in full. Measured by asking
+# a subprocess to name the project directories in its loaded instructions:
+#
+#   cwd=eval/.isolated-cwd  -> "linkwhisper-support-dash/, ... SupportDash/, blog/"
+#   cwd=/tmp/<empty dir>    -> "NONE"
+#
+# The leak was not cosmetic. In the 2026-08-09 baseline it answered G-03 with
+# "if SupportDash or one of the active builds later needs to..." and R-02 with
+# "for your microservices setup", inventing a reader whose stack it had been told
+# about. Both are exactly the ungrounded-claim failure those fixtures test for,
+# so the harness was manufacturing the defect it then graded. Every run before
+# this fix, contaminated one way or the other, is unattributable.
+#
+# The cwd therefore has to live outside the operator's home tree, and
+# assert_isolated below re-proves that on every run rather than trusting it.
+SETTING_SOURCES = "project"
+ISOLATED_CWD = Path(tempfile.gettempdir()) / "decoder-eval-isolated-cwd"
+
+
+def assert_isolated(cwd):
+    """Refuse to run if any ancestor of the subprocess cwd carries a CLAUDE.md.
+
+    Isolation that is assumed rather than measured is how this harness spent two
+    days grading the operator's config alongside the skill. This check is cheap,
+    deterministic, and fails the run loudly instead of quietly scoring it.
+    """
+    leaks = [d / "CLAUDE.md" for d in (cwd, *cwd.parents) if (d / "CLAUDE.md").exists()]
+    if leaks:
+        sys.exit(
+            "HARNESS NOT ISOLATED: CLAUDE.md found above the subprocess cwd, so "
+            "the run would grade the skill plus that file.\n  cwd: "
+            + str(cwd)
+            + "\n  "
+            + "\n  ".join(str(p) for p in leaks)
+        )
+
 
 def claude(prompt, model, timeout=TIMEOUT, allow_read_dir=None, attempts=4):
     """One headless call, retried on transient failure.
@@ -61,7 +123,8 @@ def claude(prompt, model, timeout=TIMEOUT, allow_read_dir=None, attempts=4):
        away every fixture after it. Back off and retry instead of reporting a
        skill failure that never happened.
     """
-    cmd = ["claude", "-p", prompt, "--model", model]
+    cmd = ["claude", "-p", prompt, "--model", model,
+           "--setting-sources", SETTING_SOURCES]
     if allow_read_dir:
         # The run pass may follow SKILL.md into its reference files. Headless
         # sessions deny Read by default, which silently turned the entire 2026-08-02
@@ -71,7 +134,10 @@ def claude(prompt, model, timeout=TIMEOUT, allow_read_dir=None, attempts=4):
     last = "never ran"
     for attempt in range(attempts):
         try:
-            r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+            r = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=timeout,
+                cwd=str(ISOLATED_CWD),
+            )
             if r.returncode == 0:
                 return r.stdout.strip(), None
             # Prefer stdout, fall back to stderr, and never report an empty reason.
@@ -293,6 +359,9 @@ def main():
     ap.add_argument("--workers", type=int, default=2)
     args = ap.parse_args()
 
+    ISOLATED_CWD.mkdir(parents=True, exist_ok=True)
+    assert_isolated(ISOLATED_CWD)
+
     skill_path = Path(args.skill).resolve()
     SKILL_SNAPSHOT["text"] = skill_path.read_text(encoding="utf-8")
     digest = hashlib.sha256(SKILL_SNAPSHOT["text"].encode()).hexdigest()[:12]
@@ -301,7 +370,8 @@ def main():
         print("no fixtures matched")
         sys.exit(2)
 
-    print(f"running {len(fixtures)} fixtures against {skill_path} (sha256:{digest})\n")
+    print(f"running {len(fixtures)} fixtures against {skill_path} (sha256:{digest})")
+    print(f"harness isolated: yes (cwd {ISOLATED_CWD}, setting sources {SETTING_SOURCES})\n")
     rows = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as ex:
         futures = {ex.submit(grade, f, skill_path, args.skip_judge): f for f in fixtures}
