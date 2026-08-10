@@ -68,7 +68,11 @@ Every run numbered 18 or lower is unattributable, whichever way it was contamina
 
 Runs 11 and 12 are the only pair graded against a byte-identical `SKILL.md` (`bc98651970a5`). Across the 23 fixtures both runs scored, 5 flipped: `G-03`, `M-02`, `R-03`, `R-06`, `R-10`. That is a per-fixture flip rate of roughly 22%.
 
-That figure was measured on the contaminated harness and is the basis for the thresholds above. It still needs re-measuring on the genuinely isolated harness before the numbers here are treated as calibrated, since some of that variance came from injected text rather than from model sampling. Until that is done, treat 22% as an order of magnitude and not a calibrated rate.
+That figure was measured on the contaminated harness and is the basis for the thresholds above.
+
+**Re-measured on the isolated harness, 2026-08-10.** Runs 25 and 26 are a byte-identical pair (`c26f00b2f0a8`), both graded on the isolated harness, both covering all 33 fixtures. 9 flipped: `G-04`, `Q-01`, `R-03`, `R-04`, `R-08`, `R-10`, `T-01`, `T-04`, `T-09`. That is a per-fixture flip rate of 27%, and it settles the open question above: isolation did not reduce the variance, so the 22% was model sampling and not injected text. Overall totals moved 18/33 to 17/33 on the same bytes. The refusal class alone moved 9/10 to 7/10 on the same bytes, which is the finding with teeth: **the release gate spans the noise band.** A run can clear 9/10 and the next run on the identical file can miss it, so passing the gate twice is currently a statement about sampling as much as about the file. Raising the bar does not fix this and lowering it does not either. What fixes it is grading each fixture more than once per run and gating on the majority, so a verdict is an estimate with a known error bar rather than one draw. Until that lands, no single pair of runs should be read as proof that a refusal-class defect is fixed or introduced.
+
+Individual fixtures remain measurable against this noise: `R-09` passed both runs of the pair after a targeted wording fix, having failed the baseline. Class totals and overall scores are not measurable at this sample size.
 
 ## Running it
 
