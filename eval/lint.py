@@ -116,6 +116,7 @@ def run_checks(text, mode=None):
         "source:",
         "unverified",
         "i cannot see",
+        "could not find a source",
     ]
     if mode is not None:
         has_grounding = any(m in lower for m in grounding_markers)

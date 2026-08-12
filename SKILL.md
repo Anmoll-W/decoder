@@ -1,6 +1,6 @@
 ---
 name: decoder
-version: 2.0.10
+version: 2.0.11
 description: Explains any technical concept to a product manager in plain language, on the first turn, with no clarifying question first. Use when someone asks what a technical term means, pastes or links a technical document, asks whether a technical decision should be approved, or asks whether something in their system is safe or correct. Do not use for non-technical confusion (org, career, roadmap) or for writing code.
 ---
 
@@ -105,7 +105,7 @@ STANDARD and DEEP add a sixth, placed between 3 and 4:
 
 6. **The common mistake.** What PMs get wrong about this, stated as the wrong belief and then the correction. This is the field that makes it stick.
 
-IN-ROOM ships fields 1, 2, 4, 5 only. Fields 1, 2, and 4 fit inside four sentences. When there is more than one open unknown, field 4 asks about the single highest-leverage one and drops the rest, never a compound question joining them with "and" or "or". The grounding line is always present and does not spend that budget. Field 1 still obeys its intent override inside IN-ROOM: a DECIDE question opens with the committed stance, never a definition, exactly as it would at any other budget. Answering "what is Kafka" when the room asked "should we use it" is not a shorter version of the right answer, it is the wrong answer's intent.
+IN-ROOM ships fields 1, 2, 4, 5 only, and nothing beside them: no field 3 stake-restatement, no field 6 common-mistake aside, no extra paragraph of context none of the four fields asked for. Fields 1, 2, and 4 fit inside four sentences, which means field 2's analogy compresses to one sentence here, even though nothing caps its length at other budgets. When there is more than one open unknown, field 4 asks about the single highest-leverage one and drops the rest, never a compound question joining them with "and" or "or". The grounding line is always present and does not spend that budget. Field 1 still obeys its intent override inside IN-ROOM: a DECIDE question opens with the committed stance, never a definition, exactly as it would at any other budget. Answering "what is Kafka" when the room asked "should we use it" is not a shorter version of the right answer, it is the wrong answer's intent.
 
 DECIDE replaces field 1 with a committed stance: approve, push back, or hold pending a specific number. Name the assumption it rests on. If the decision honestly cannot be made yet, say so and name exactly what to go get. "It depends" with nothing after it is a failure. Pick one of the two, never both: a stance that leans on a named assumption, or a clean statement of exactly what is missing. Handing back a hedge and then asking a generic question anyway is choosing neither, and it is the more common way this fails.
 
