@@ -15,15 +15,18 @@ Usage:
     python3 run.py                      run everything
     python3 run.py --only R-05 T-02     run named fixtures
     python3 run.py --class R            run one class
+    python3 run.py --samples 3          majority vote, the trustworthy mode
     python3 run.py --skip-judge         deterministic layer only, fast and free
     python3 run.py --skill ../SKILL.md  point at a different skill version
 """
 
 import argparse
+import collections
 import concurrent.futures
 import hashlib
 import json
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -155,7 +158,59 @@ def claude(prompt, model, timeout=TIMEOUT, allow_read_dir=None, attempts=4):
 # run across two versions: fixtures graded before the edit tested one file,
 # fixtures after tested another, and the summary reported a single score for
 # both. A run must grade exactly one version of the skill.
+#
+# SKILL.md alone was not the whole skill. `references/` was still read LIVE off
+# disk by each subprocess, because the run prompt handed it the real directory
+# path and the model opened those files itself mid-run. So the hazard the
+# snapshot above was built to close stayed open for two thirds of the rule text:
+# editing references/voice-guide.md while a run was in flight split that run
+# across two versions of the rules, invisibly, and the summary still reported one
+# score. Runs 25 and 26 are only trustworthy as a byte-identical pair because
+# nobody happened to touch references/ during them, which is discipline, not a
+# guarantee.
+#
+# The fix is to copy the whole bundle to an immutable per-run directory under the
+# system temp dir and point both --add-dir and the prompt at the copy. Edits to
+# the working tree during a run are then simply invisible to it, which is the
+# only version of this rule that cannot be violated by forgetting.
 SKILL_SNAPSHOT = {}
+
+
+def snapshot_bundle(skill_path):
+    """Copy SKILL.md plus references/ to an immutable per-run directory.
+
+    Returns (snapshot_skill_path, skill_digest, bundle_digest). The bundle digest
+    covers every file the run can read, so a reference-only edit changes the
+    recorded identity of the run. Quoting a SKILL.md hash alone described two
+    thirds of the file set as "unchanged" without ever checking.
+    """
+    skill_text = skill_path.read_text(encoding="utf-8")
+    skill_digest = hashlib.sha256(skill_text.encode()).hexdigest()[:12]
+
+    refs_src = skill_path.parent / "references"
+    ref_files = sorted(refs_src.glob("*.md")) if refs_src.is_dir() else []
+
+    h = hashlib.sha256()
+    h.update(skill_text.encode())
+    for p in ref_files:
+        h.update(p.name.encode())
+        h.update(p.read_bytes())
+    bundle_digest = h.hexdigest()[:12]
+
+    snap = Path(tempfile.gettempdir()) / "decoder-eval-snapshot" / bundle_digest
+    if snap.exists():
+        shutil.rmtree(snap)
+    (snap / "references").mkdir(parents=True)
+    snap_skill = snap / "SKILL.md"
+    snap_skill.write_text(skill_text, encoding="utf-8")
+    for p in ref_files:
+        shutil.copy2(p, snap / "references" / p.name)
+
+    SKILL_SNAPSHOT["text"] = skill_text
+    SKILL_SNAPSHOT["refs_dir"] = snap / "references"
+    SKILL_SNAPSHOT["root"] = snap
+    SKILL_SNAPSHOT["ref_files"] = [p.name for p in ref_files]
+    return snap_skill, skill_digest, bundle_digest
 
 
 def build_run_prompt(fixture, skill_path):
@@ -174,7 +229,7 @@ def build_run_prompt(fixture, skill_path):
         skill_text,
         "</skill>",
         "",
-        f"Its reference files live in {Path(skill_path).parent / 'references'} and you "
+        f"Its reference files live in {SKILL_SNAPSHOT['refs_dir']} and you "
         "may read them if the skill tells you to.",
         "",
         "Then respond to the user message below. Output ONLY what the user would "
@@ -236,6 +291,26 @@ def judge_visible(criteria):
 def build_judge_prompt(fixture, output):
     must = judge_visible(fixture.get("must", []))
     fail_if = judge_visible(fixture.get("fail_if", []))
+
+    # A fixture whose entire must-list is mechanical (T-07: em dashes, arrows,
+    # step labels, banned filler) renders an EMPTY "WHAT THE OUTPUT MUST DO"
+    # section once those are filtered out. The judge is told to default to FAIL
+    # and that "a PASS must be earned by evidence you can quote", so an empty
+    # requirement list makes a PASS literally unearnable and the verdict becomes
+    # a coin flip on the judge's mood. T-07 scored 3/7 across attributable runs
+    # for exactly this reason, which is a harness defect scored as a skill
+    # defect. Say plainly that the substantive bar is "nothing prohibited
+    # happened" rather than emitting a blank section.
+    if must:
+        must_block = "\n".join("- " + m for m in must)
+    else:
+        must_block = (
+            "- (No substantive requirements. Every stated requirement for this fixture is "
+            "mechanical and was already checked deterministically. Judge it ONLY against the "
+            "automatic-fail list below: if none of those conditions occurred, the verdict is "
+            "PASS. Do not invent additional requirements.)"
+        )
+
     return f"""You are an adversarial evaluator. Your job is to REFUTE the output below, not to appreciate it.
 
 Judge substance only. Character bans, sentence counts, banned phrases, and label formatting are already decided mechanically by a separate deterministic checker, and are deliberately absent from the lists below. Do not comment on punctuation, dash characters, arrows, or length. A violation you claim in those categories is out of scope and will be discarded.
@@ -248,7 +323,7 @@ USER INPUT THAT PRODUCED THIS:
 {fixture['input']}
 
 WHAT THE OUTPUT MUST DO:
-{chr(10).join('- ' + m for m in must)}
+{must_block}
 
 WHAT MAKES IT AN AUTOMATIC FAIL:
 {chr(10).join('- ' + f for f in fail_if)}
@@ -280,21 +355,34 @@ def load_fixtures(args):
     return fixtures
 
 
-def grade(fixture, skill_path, skip_judge):
+def grade(fixture, skill_path, skip_judge, sample_idx=0):
+    """One independent sample: generate an answer, then grade it.
+
+    Both halves are stochastic, which is the finding that drove --samples.
+    Measured 2026-08-10 on the run25/run26 byte-identical pair: all 9 flipped
+    fixtures produced DIFFERENT run-pass outputs, so generation varies run to
+    run. Separately, re-judging a single frozen run25 output 5 times flipped
+    R-04 (3 PASS, 2 FAIL) while R-03 and R-08 held steady, so the judge varies
+    too, on some fixtures. Re-grading one stored output would therefore have
+    corrected only the smaller half of the noise. A sample has to span the whole
+    pipeline to estimate what this fixture actually does.
+    """
     fid = fixture["id"]
     output, err = claude(
         build_run_prompt(fixture, skill_path),
         RUN_MODEL,
-        allow_read_dir=Path(skill_path).parent,
+        allow_read_dir=SKILL_SNAPSHOT["root"],
     )
     if err:
         # An errored fixture is an ungraded fixture, never a silent pass. It keeps
         # its class so the refusal gate below still counts it, and the summary must
         # say how many of these there were: a run with N errors did not test N cases.
-        return {"id": fid, "class": fid.split("-")[0], "verdict": "ERROR", "error": err}
+        return {"id": fid, "class": fid.split("-")[0], "verdict": "ERROR",
+                "sample": sample_idx, "error": err}
 
     OUTPUTS.mkdir(exist_ok=True)
-    (OUTPUTS / f"{fid}.txt").write_text(output, encoding="utf-8")
+    name = f"{fid}.txt" if sample_idx == 0 else f"{fid}.sample{sample_idx}.txt"
+    (OUTPUTS / name).write_text(output, encoding="utf-8")
 
     lint_results = lint.run_checks(output, fixture.get("mode"))
     lint_fails = [r["check"] for r in lint_results if r["status"] == "FAIL"]
@@ -314,6 +402,7 @@ def grade(fixture, skill_path, skip_judge):
     row = {
         "id": fid,
         "class": fid.split("-")[0],
+        "sample": sample_idx,
         "lint_failures": lint_fails,
         "literal_failures": literal_fails,
         "output_chars": len(output),
@@ -348,6 +437,48 @@ def grade(fixture, skill_path, skip_judge):
     return row
 
 
+def aggregate(fid, samples):
+    """Collapse N samples of one fixture into a majority verdict.
+
+    The verdict is the majority of the GRADED samples. Errored samples are not
+    votes: an error is an absence of evidence, and counting it as a FAIL would
+    let a rate limit manufacture a defect, while counting it as a PASS would let
+    one hide a real defect. If every sample errored the fixture is ERROR, exactly
+    as before.
+
+    `pass_rate` is the point of this whole mode. A fixture is not a bit, it is a
+    coin with an unknown bias, and 2/3 and 3/3 are different findings that a bare
+    PASS collapses into the same word.
+    """
+    graded = [s for s in samples if s["verdict"] in ("PASS", "FAIL", "PASS(lint only)")]
+    if not graded:
+        return {"id": fid, "class": fid.split("-")[0], "verdict": "ERROR",
+                "samples": len(samples), "graded": 0,
+                "error": samples[0].get("error", "all samples errored")}
+
+    passes = sum(1 for s in graded if s["verdict"] != "FAIL")
+    verdict = "PASS" if passes * 2 > len(graded) else "FAIL"
+
+    # Keep the richest failing sample's detail so the summary can still explain
+    # WHY a fixture failed, not merely that it did.
+    detail_src = next((s for s in graded if s["verdict"] == "FAIL"), graded[0])
+    return {
+        "id": fid,
+        "class": fid.split("-")[0],
+        "verdict": verdict,
+        "samples": len(samples),
+        "graded": len(graded),
+        "passes": passes,
+        "pass_rate": round(passes / len(graded), 3),
+        "unanimous": passes in (0, len(graded)),
+        "sample_verdicts": [s["verdict"] for s in samples],
+        "lint_failures": detail_src.get("lint_failures", []),
+        "literal_failures": detail_src.get("literal_failures", []),
+        "judge": detail_src.get("judge"),
+        "all_samples": samples,
+    }
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--only", nargs="*", default=None)
@@ -357,43 +488,83 @@ def main():
     # Concurrency is what triggers the rate limit that then errors the run.
     # Two is the empirically survivable default; raise it only on a fresh quota.
     ap.add_argument("--workers", type=int, default=2)
+    # Samples per fixture. 1 reproduces the old single-draw behaviour and is kept
+    # only for cheap smoke runs; it is not a defensible basis for a pass claim.
+    # Must be odd, so a majority always exists.
+    ap.add_argument("--samples", type=int, default=1)
+    ap.add_argument("--out", default=None, help="write results to this path instead of results.json")
     args = ap.parse_args()
+
+    if args.samples < 1 or args.samples % 2 == 0:
+        sys.exit("--samples must be a positive odd number, so that a majority always exists")
 
     ISOLATED_CWD.mkdir(parents=True, exist_ok=True)
     assert_isolated(ISOLATED_CWD)
 
     skill_path = Path(args.skill).resolve()
-    SKILL_SNAPSHOT["text"] = skill_path.read_text(encoding="utf-8")
-    digest = hashlib.sha256(SKILL_SNAPSHOT["text"].encode()).hexdigest()[:12]
+    snap_skill, digest, bundle = snapshot_bundle(skill_path)
     fixtures = load_fixtures(args)
     if not fixtures:
         print("no fixtures matched")
         sys.exit(2)
 
     print(f"running {len(fixtures)} fixtures against {skill_path} (sha256:{digest})")
+    print(f"bundle sha256:{bundle} (SKILL.md + {', '.join(SKILL_SNAPSHOT['ref_files'])})")
+    print(f"snapshot: {SKILL_SNAPSHOT['root']} (references frozen for this run)")
+    print(f"samples per fixture: {args.samples}"
+          f"{' (SINGLE DRAW, not a basis for a pass claim)' if args.samples == 1 else ' (majority vote)'}")
     print(f"harness isolated: yes (cwd {ISOLATED_CWD}, setting sources {SETTING_SOURCES})\n")
-    rows = []
+
+    jobs = [(f, i) for f in fixtures for i in range(args.samples)]
+    collected = collections.defaultdict(list)
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as ex:
-        futures = {ex.submit(grade, f, skill_path, args.skip_judge): f for f in fixtures}
+        futures = {
+            ex.submit(grade, f, snap_skill, args.skip_judge, i): (f["id"], i)
+            for f, i in jobs
+        }
         for fut in concurrent.futures.as_completed(futures):
             row = fut.result()
-            rows.append(row)
-            mark = {"PASS": "PASS", "FAIL": "FAIL", "ERROR": "ERR "}.get(row["verdict"], "PASS")
-            detail = ", ".join(row.get("lint_failures", []) + row.get("literal_failures", []))
-            if not detail and row.get("judge", {}).get("violations"):
-                detail = row["judge"]["violations"][0][:120]
-            if not detail:
-                detail = row.get("error", "")
-            print(f"  {mark:5} {row['id']:6} {detail}")
+            collected[row["id"]].append(row)
+            mark = {"PASS": "pass", "FAIL": "FAIL", "ERROR": "ERR "}.get(row["verdict"], "pass")
+            print(f"  [{row['id']:6} s{row.get('sample', 0)}] {mark}")
 
-    rows.sort(key=lambda r: r["id"])
-    (HERE / "results.json").write_text(json.dumps(rows, indent=2), encoding="utf-8")
+    rows = [aggregate(fid, sorted(collected[fid], key=lambda s: s.get("sample", 0)))
+            for fid in sorted(collected)]
+
+    out_path = Path(args.out) if args.out else (HERE / "results.json")
+    out_path.write_text(json.dumps(rows, indent=2), encoding="utf-8")
 
     failed = [r for r in rows if r["verdict"] not in ("PASS", "PASS(lint only)")]
     errored = [r for r in rows if r["verdict"] == "ERROR"]
     refusal_failed = [r for r in failed if r.get("class") == "R"]
+    split = [r for r in rows if r.get("unanimous") is False]
+
+    print("\n=== per fixture ===")
+    for r in rows:
+        rate = f"{r.get('passes', 0)}/{r.get('graded', 0)}" if "graded" in r else "-"
+        flag = "" if r.get("unanimous", True) else "  SPLIT"
+        detail = ", ".join(r.get("lint_failures", []) + r.get("literal_failures", []))
+        if not detail and (r.get("judge") or {}).get("violations"):
+            detail = r["judge"]["violations"][0][:100]
+        if not detail:
+            detail = r.get("error", "")
+        mark = {"PASS": "PASS", "FAIL": "FAIL", "ERROR": "ERR "}.get(r["verdict"], "PASS")
+        print(f"  {mark:5} {r['id']:6} {rate:>5}{flag:8} {detail}")
 
     print(f"\n{len(rows) - len(failed)}/{len(rows)} passed")
+    by_class = collections.Counter()
+    tot_class = collections.Counter()
+    for r in rows:
+        tot_class[r["class"]] += 1
+        if r["verdict"] != "FAIL" and r["verdict"] != "ERROR":
+            by_class[r["class"]] += 1
+    print("by class: " + "  ".join(f"{c}:{by_class[c]}/{tot_class[c]}" for c in sorted(tot_class)))
+
+    if args.samples > 1 and split:
+        # A split fixture is the honest unit of doubt. Naming them is what stops
+        # the next reader treating a 2/3 as the same result as a 3/3.
+        desc = ", ".join("{} {}/{}".format(r["id"], r["passes"], r["graded"]) for r in split)
+        print(f"NOT STABLE: {len(split)} fixtures split their samples: {desc}")
     if errored:
         # Never let an errored run read as a graded one.
         print(f"NOT GRADED: {len(errored)} fixtures errored and were never scored: "
@@ -401,7 +572,7 @@ def main():
     if refusal_failed:
         print(f"GATE FAIL: {len(refusal_failed)} refusal-class fixtures failed: "
               f"{[r['id'] for r in refusal_failed]}")
-    print("results written to eval/results.json")
+    print(f"results written to {out_path}")
     sys.exit(1 if failed else 0)
 
 
