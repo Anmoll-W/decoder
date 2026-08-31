@@ -1,3 +1,5 @@
+> **Moved.** This skill now lives in [thepmcode-skills](https://github.com/Anmoll-W/thepmcode-skills), the full PM Code skill set. This repository is archived and read-only. For the current version, install it from the hub.
+
 ![Decoder: Technical concepts explained for PMs](cover.png)
 
 # Decoder
